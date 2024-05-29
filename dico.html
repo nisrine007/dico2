@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#007BFF">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dictionnaire Perso</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        input[type="text"], select {
+            padding: 10px;
+            margin: 5px 0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .delete-button {
+            background-color: #FF4136;
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 5px 10px;
+        }
+        .delete-button:hover {
+            background-color: #C0392B;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Créer ton Dictionnaire Perso</h1>
+    <form id="dictionnaireForm">
+        <label for="motFrancais">Mot en Français:</label>
+        <input type="text" id="motFrancais" required>
+        <label for="traduction">Traduction:</label>
+        <input type="text" id="traduction" required>
+        <button type="submit">Ajouter</button>
+    </form>
+
+    <h2>Liste des Mots</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Mot en Français</th>
+                <th>Traduction</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="dictionnaireTableBody">
+            <!-- Les mots ajoutés apparaîtront ici -->
+        </tbody>
+    </table>
+
+    <script>
+        document.getElementById('dictionnaireForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            let motFrancais = document.getElementById('motFrancais').value;
+            let traduction = document.getElementById('traduction').value;
+            
+            let dictionnaire = JSON.parse(localStorage.getItem('dictionnaire')) || [];
+            dictionnaire.push({ motFrancais, traduction });
+            dictionnaire.sort((a, b) => a.motFrancais.localeCompare(b.motFrancais));
+            localStorage.setItem('dictionnaire', JSON.stringify(dictionnaire));
+            
+            afficherDictionnaire();
+            document.getElementById('dictionnaireForm').reset();
+        });
+
+        function afficherDictionnaire() {
+            let dictionnaire = JSON.parse(localStorage.getItem('dictionnaire')) || [];
+            let tableBody = document.getElementById('dictionnaireTableBody');
+            tableBody.innerHTML = '';
+
+            let currentLetter = '';
+            dictionnaire.forEach((item, index) => {
+                if (item.motFrancais.charAt(0).toUpperCase() !== currentLetter) {
+                    currentLetter = item.motFrancais.charAt(0).toUpperCase();
+                    let row = document.createElement('tr');
+                    let cell = document.createElement('td');
+                    cell.colSpan = 3;
+                    cell.style.fontWeight = 'bold';
+                    cell.style.backgroundColor = '#f2f2f2';
+                    cell.textContent = currentLetter;
+                    row.appendChild(cell);
+                    tableBody.appendChild(row);
+                }
+
+                let row = document.createElement('tr');
+                let cellMot = document.createElement('td');
+                cellMot.textContent = item.motFrancais;
+                let cellTraduction = document.createElement('td');
+                cellTraduction.textContent = item.traduction;
+                let cellAction = document.createElement('td');
+                let deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Supprimer';
+                deleteButton.className = 'delete-button';
+                deleteButton.onclick = () => supprimerMot(index);
+                cellAction.appendChild(deleteButton);
+                row.appendChild(cellMot);
+                row.appendChild(cellTraduction);
+                row.appendChild(cellAction);
+                tableBody.appendChild(row);
+            });
+        }
+
+        function supprimerMot(index) {
+            let dictionnaire = JSON.parse(localStorage.getItem('dictionnaire')) || [];
+            dictionnaire.splice(index, 1);
+            dictionnaire.sort((a, b) => a.motFrancais.localeCompare(b.motFrancais));
+            localStorage.setItem('dictionnaire', JSON.stringify(dictionnaire));
+            afficherDictionnaire();
+        }
+
+        afficherDictionnaire();
+    </script>
+
+</body>
+</html>

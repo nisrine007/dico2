@@ -1,0 +1,15 @@
+{
+  "name": "Dictionnaire Perso",
+  "short_name": "Dictionnaire",
+  "start_url": "/dico.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#007BFF",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
